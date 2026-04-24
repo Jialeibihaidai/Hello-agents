@@ -172,6 +172,13 @@ class MultiAgentTripPlanner:
                 env={"AMAP_MAPS_API_KEY": settings.amap_api_key},
                 auto_expand=True
             )
+            # hello-agents 0.2.9 的 MCPTool 支持 get_expanded_tools(),
+            # 但未把 expandable 标记传给 Tool 基类。这里显式打开,
+            # 否则 Agent 只会注册父工具 amap,不会注册 amap_maps_text_search 等子工具。
+            self.amap_tool.expandable = True
+            print(f"   可用高德MCP工具数量: {len(self.amap_tool._available_tools)}")
+            if not self.amap_tool._available_tools:
+                print("   ⚠️ 未发现高德MCP子工具,请检查 uvx/amap-mcp-server 是否能正常启动")
 
             # 创建景点搜索Agent
             print("  - 创建景点搜索Agent...")
@@ -426,4 +433,3 @@ def get_trip_planner_agent() -> MultiAgentTripPlanner:
         _multi_agent_planner = MultiAgentTripPlanner()
 
     return _multi_agent_planner
-
